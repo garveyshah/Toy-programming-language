@@ -14,7 +14,7 @@ correct syntax in the process. */
 // common interface for all AST nodes.
 type Node interface {
 	TokenLiteral() string
-	//String() string
+	String() string
 }
 
 // represents the whole program
@@ -27,6 +27,7 @@ type Statement interface {
 	Node
 	statementNode()
 }
+
 
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
@@ -46,10 +47,10 @@ type VarStatement struct {
 func (vs *VarStatement) statementNode()       {}
 func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
 
-// // StatementNode implements Statement.
-// func (vs *VarStatement) StatementNode() {
-// 	panic("unimplemented")
-// }
+// StatementNode implements Statement.
+func (vs *VarStatement) StatementNode() {
+	panic("unimplemented")
+}
 
 // represents variable names
 type Identifier struct {
@@ -105,6 +106,9 @@ func (il *IntegerLiteral) ExpressionNode() {}
 func (il *IntegerLiteral) TokenLiteral() string {
 	return il.Token.Literal
 }
+func (il *IntegerLiteral) String() string {
+	return il.Token.Literal
+}
 
 type BinaryExpression struct {
 	Left     Expression
@@ -147,7 +151,7 @@ func (p *Program) String() string {
 	return out.String()
 }
 
-func (ls *VarStatement) string() string {
+func (ls *VarStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(ls.TokenLiteral() + " ")
@@ -163,6 +167,7 @@ func (ls *VarStatement) string() string {
 
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
+	
 	out.WriteString(rs.TokenLiteral()+ " ")
 	
 	if rs.ReturnValue != nil {
