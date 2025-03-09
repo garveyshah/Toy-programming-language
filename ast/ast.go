@@ -28,14 +28,12 @@ type Statement interface {
 	statementNode()
 }
 
-
-func (p *Program) TokenLiteral() string {
-	if len(p.Statements) > 0 {
-		return p.Statements[0].TokenLiteral()
-	} else {
-		return ""
-	}
-}
+// resents a Prefix expression e.g "-15; or !5;"
+type PrefixExpression struct {
+	Token token.Token	// the prefix token, e.g. !
+	Operator string		// contains either "-" or "!"
+	Right Expression	// contains the expression to the right of the expression
+} 
 
 // represents a variable declaration(var x = 5)
 type VarStatement struct {
@@ -44,26 +42,10 @@ type VarStatement struct {
 	Value Expression
 }
 
-func (vs *VarStatement) statementNode()       {}
-func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
-
-// StatementNode implements Statement.
-func (vs *VarStatement) StatementNode() {
-	panic("unimplemented")
-}
-
 // represents variable names
 type Identifier struct {
 	Token token.Token // The token.IDENTIFIER token
 	Value string
-}
-
-func (i *Identifier) ExpressionNode() {}
-func (i *Identifier) TokenLiteral() string {
-	if i.Token.Literal == "" {
-		return "nil"
-	}
-	return i.Token.Literal
 }
 
 type AssignStatement struct {
@@ -71,9 +53,6 @@ type AssignStatement struct {
 	Name  *Identifier
 	Value Expression
 }
-
-func (as *AssignStatement) statementNode()       {}
-func (as *AssignStatement) TokenLiteral() string { return as.Token.Literal }
 
 type StringLiteral struct {
 	Token token.Token // the token.STRING token
@@ -83,6 +62,42 @@ type Boolean struct {
 	Token token.Token // the token.BOOL token
 	Value bool
 }
+
+
+// represents interger values
+type IntegerLiteral struct {
+	Token token.Token // The token.INT token
+	Value int64
+}
+type ExpressionStatement struct {
+	Token      token.Token
+	Expression Expression
+}
+
+
+func (vs *VarStatement) statementNode()       {}
+func (vs *VarStatement) TokenLiteral() string { return vs.Token.Literal }
+
+// StatementNode implements Statement.
+func (vs *VarStatement) StatementNode() {
+	panic("unimplemented")
+}
+
+
+func (i *Identifier) ExpressionNode() {}
+func (i *Identifier) TokenLiteral() string {
+	if i.Token.Literal == "" {
+		return "nil"
+	}
+	return i.Token.Literal
+}
+
+
+
+func (as *AssignStatement) statementNode()       {}
+func (as *AssignStatement) TokenLiteral() string { return as.Token.Literal }
+
+
 
 func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
@@ -96,11 +111,6 @@ type Expression interface {
 	ExpressionNode()
 }
 
-// represents interger values
-type IntegerLiteral struct {
-	Token token.Token // The token.INT token
-	Value int64
-}
 
 func (il *IntegerLiteral) ExpressionNode() {}
 func (il *IntegerLiteral) TokenLiteral() string {
@@ -134,10 +144,7 @@ type ReturnStatement struct {
 func (rs *ReturnStatement) statementNode()       {}
 func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
 
-type ExpressionStatement struct {
-	Token      token.Token
-	Expression Expression
-}
+
 
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
@@ -187,3 +194,17 @@ func (es *ExpressionStatement) String() string {
 }
 
 func (i *Identifier) String() string { return i.Value }
+
+// Prefix Expression functions
+func (pe *PrefixExpression) expressionNOde() {}
+func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
+func (pe *PrefixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
