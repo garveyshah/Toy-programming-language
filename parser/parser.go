@@ -21,6 +21,17 @@ const (
 
 )
 
+// Precidence table : Associates token types with their precedence
+var precedences = map[token.TokenType]int{
+	token.EQ: EQUALS,
+	token.NOT_EQ: EQUALS,
+	token.LT: LESSGREATER,
+	token.GT: LESSGREATER,
+	token.PLUS: SUM,
+	token.MINUS: SUM,
+	token.FSLASH: PRODUCT,
+}
+
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
@@ -54,6 +65,45 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
 	return p
+}
+
+// Assigns precedence values to peekTokens
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precedences[p.peekToken.Type];ok {
+		return p
+	}
+
+	return LOWEST
+}
+
+// Assigns precedence values to curTokens
+func (p *Parser) curPrecedence() int {
+	if p, ok := precedences[p.curToken.Type]; ok {  
+		return p
+	}
+	return LOWEST
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.preficFarseFns[p.curToken.Type]
+	if prefix == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
+		return nil
+	}
+	leftExp := prefix()
+
+	for !p.peekTokenIS(token.SEMICOLON) && precedence < p.peekPrecedence() {
+		infix := p.infixParseFns[p.peekToken.Type]
+		if infix == nil {
+			return leftExp
+		}
+
+		p.nextToken()
+
+		leftExp = infix(leftExp)
+	}
+
+	return leftExp
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
