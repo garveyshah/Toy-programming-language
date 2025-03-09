@@ -196,7 +196,7 @@ func (es *ExpressionStatement) String() string {
 func (i *Identifier) String() string { return i.Value }
 
 // Prefix Expression functions
-func (pe *PrefixExpression) expressionNOde() {}
+func (pe *PrefixExpression) ExpressionNode() {}
 func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
 func (pe *PrefixExpression) String() string {
 	var out bytes.Buffer
