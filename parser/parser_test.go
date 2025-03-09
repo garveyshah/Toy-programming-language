@@ -174,7 +174,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		operator string
 		integerValue int64
 	}{
-		{"15;", "!", 5},
+		{"!5;", "!", 5},
 		{"-15;", "-", 15},
 	}
 
@@ -185,8 +185,8 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		checkParserErrors(t, p)
 
 		if len(program.Statements) != 1 {
-			t.Fatalf("program.statements does not contain %d statements. got=%d\n",l, len(program.Statements))
-		}
+			t.Fatalf("program.statements does not contain %d statements. got=%d\n",1, len(program.Statements))
+		} 
 
 		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 		if !ok {
@@ -197,8 +197,9 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		if !ok {
 			t.Fatalf("stmt is not ast.PrefixExpression. got=%T", stmt.Expression)
 		} 
+
 		if exp.Operator != tt.operator {
-			t.Fatalf("exp.Operator is not '%s', got=%s", tt.operator, exp.operator)
+			t.Fatalf("exp.Operator is not '%s', got=%s", tt.operator, exp.Operator)
 		}
 		if !testIntegerLiteral(t, exp.Right, tt.integerValue) {
 			return
